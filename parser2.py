@@ -22,19 +22,18 @@ start = 'program'
 
 def p_error(p):
     if p:
-        print("Syntax error at line {0}, column {1}: LexToken({2}, '{3}')".format(p.lineno, scanner.find_column(p),
-                                                                                  p.type, p.value))
+        print("Syntax error at line {0}: LexToken({1}, '{2}')".format(p.lineno, p.type, p.value))
     else:
         print("Unexpected end of input")
 
 def p_program(p):
     """program : statement program
                 | loop program"""
-    p[0] = Program(p)
+    p[0] = Program(p, p.lineno)
 
 def p_program_empty(p):
     """program : empty"""
-    p[0] = Empty(p)
+    p[0] = Empty(p, p.lineno)
 
 def p_empty(p):
     """empty :"""
@@ -50,7 +49,7 @@ def p_expression_assign(p):
                   | expression ASSIGN_SUB expression ';'
                   | expression ASSIGN_MUL expression ';'
                   | expression ASSIGN_DIV expression ';'"""
-    p[0] = Assignment(p)
+    p[0] = Assignment(p, p.lineno)
 
 def p_expression_statement(p):
     """statement : expression ';'"""
@@ -105,9 +104,9 @@ def p_expression_id(p):
     """expression : ID '[' expression ',' expression  ']'
                 | ID """
     if(len(p) > 2):
-        p[0] = IDAt(p)
+        p[0] = IDAt(p, p.lineno)
     else:
-        p[0] = ID(p)
+        p[0] = ID(p, p.lineno)
 
 
 ################################################
@@ -116,31 +115,31 @@ def p_expression_id(p):
 
 def p_num_expression_add(p):
     """expression : expression ADD expression"""
-    p[0] = BinaryOperation(p, 'num', '+')
+    p[0] = BinaryOperation(p, p.lineno)
 
 def p_num_expression_sub(p):
     """expression : expression SUB expression"""
-    p[0] = BinaryOperation(p, 'num', '-')
+    p[0] = BinaryOperation(p, p.lineno)
 
 def p_num_expression_div(p):
     """expression : expression DIV expression"""
-    p[0] = BinaryOperation(p, 'num', '/')
+    p[0] = BinaryOperation(p, p.lineno)
 
 def p_num_expression_mul(p):
     """expression : expression MUL expression"""
-    p[0] = BinaryOperation(p, 'num', '*')
+    p[0] = BinaryOperation(p, p.lineno)
 
 def p_num_expression_unary_minus(p):
     """expression : SUB expression %prec U_SUB"""
-    p[0] = UnaryOperation(p, p[1])
+    p[0] = UnaryOperation(p, p.lineno, p[1])
 
 def p_num_expression_int(p):
     """expression : INT_NUM"""
-    p[0] = Number(p,'int')
+    p[0] = Number(p, p.lineno, 'int')
 
 def p_num_expression_float(p):
     """expression : FLOAT_NUM"""
-    p[0] = Number(p, 'float')
+    p[0] = Number(p, p.lineno, 'float')
 
 ################################################
 # ..........matrix expressions..................
@@ -152,22 +151,22 @@ def p_matrix_expression_init(p):
                  | ONES '(' INT_NUM ')'
                  | EYE '(' INT_NUM ')'"""
 
-    p[0] = Matrix(p, type=p[1])
+    p[0] = Matrix(p, p.lineno, type=p[1])
 
 
 def p_matrix_expression_value(p):
     """expression :  '[' ']'
                  | '[' list2D ']'"""
-    p[0] = Matrix(p)
+    p[0] = Matrix(p, p.lineno)
 
 def p_matrix_expressions(p):
     """expression : expression TRANSPOSE"""
-    p[0] = UnaryOperation(p, p[2])
+    p[0] = UnaryOperation(p, p.lineno, p[2])
 
 def p_matrix_expression_add(p):
     """expression : expression DOT_ADD expression"""
 
-    p[0] = BinaryOperation(p, 'matrix', '+')
+    p[0] = BinaryOperation(p, p.lineno,'matrix', '+')
 
 def p_matrix_expression_sub(p):
     """expression : expression DOT_SUB expression"""

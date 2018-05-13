@@ -10,10 +10,6 @@ def addToClass(cls):
 
 class TreePrinter:
 
-    @addToClass(entities.Variable)
-    def printTree(self, indent=0):
-        print('| ' * indent + self.value)
-
     @addToClass(entities.Condition)
     def printTree(self, indent=0):
         print('| ' * indent + 'IF')
@@ -24,9 +20,6 @@ class TreePrinter:
             print('| ' * indent + 'ELSE')
             self.statement2.printTree(indent+1)
 
-    # @addToClass(entities.Constant)
-    # def printTree(self, indent=0):
-    #     print('| ' * indent + )
 
     @addToClass(entities.Matrix)
     def printTree(self, indent=0):
@@ -96,10 +89,6 @@ class TreePrinter:
         print('| ' * indent + 'PRINT')
         self.list.printTree(indent+1)
 
-    @addToClass(entities.Index)
-    def printTree(self, indent=0):
-        print('| ' * indent + 'INDEX')
-        print('| ' * (indent + 1) + self.val)
 
     @addToClass(entities.Program)
     def printTree(self, indent=0):
