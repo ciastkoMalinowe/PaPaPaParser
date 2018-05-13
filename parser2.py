@@ -45,11 +45,11 @@ def p_empty(p):
 ################################################
 
 def p_expression_assign(p):
-    """statement : id_expression ASSIGN expression ';'
-                  | id_expression ASSIGN_ADD expression ';'
-                  | id_expression ASSIGN_SUB expression ';'
-                  | id_expression ASSIGN_MUL expression ';'
-                  | id_expression ASSIGN_DIV expression ';'"""
+    """statement : expression ASSIGN expression ';'
+                  | expression ASSIGN_ADD expression ';'
+                  | expression ASSIGN_SUB expression ';'
+                  | expression ASSIGN_MUL expression ';'
+                  | expression ASSIGN_DIV expression ';'"""
     p[0] = Assignment(p)
 
 def p_expression_statement(p):
@@ -61,17 +61,17 @@ def p_print(p):
     p[0] = Print(p)
 
 def p_loop_while(p):
-    """loop : WHILE '(' bool_expression ')' '{' program '}' """
+    """loop : WHILE '(' expression ')' '{' program '}' """
     p[0] = WhileLoop(p)
 
 
 def p_loop_for(p):
-    """loop : FOR ID ASSIGN index RANGE index '{' program '}'"""
+    """loop : FOR ID ASSIGN expression RANGE expression '{' program '}'"""
     p[0] = ForLoop(p)
 
 def p_condition_if(p):
-    """statement : IF '(' bool_expression ')' statement %prec IFX
-                | IF '(' bool_expression ')' statement ELSE statement"""
+    """statement : IF '(' expression ')' statement %prec IFX
+                | IF '(' expression ')' statement ELSE statement"""
     p[0] = Condition(p)
 
 
@@ -93,10 +93,6 @@ def p_return(p):
 
 def p_expression(p):
     """expression : '(' expression ')'
-                | bool_expression
-                | num_expression
-                | matrix_expression
-                | id_expression
                 | STRING"""
 
     if p[1] == '(':
@@ -106,7 +102,7 @@ def p_expression(p):
 
 
 def p_expression_id(p):
-    """id_expression : ID '[' index ',' index  ']'
+    """expression : ID '[' expression ',' expression  ']'
                 | ID """
     if(len(p) > 2):
         p[0] = IDAt(p)
@@ -119,141 +115,93 @@ def p_expression_id(p):
 ################################################
 
 def p_num_expression_add(p):
-    """num_expression : num_expression ADD num_expression
-                    | id_expression ADD id_expression
-                    | num_expression ADD id_expression
-                    | id_expression ADD num_expression"""
+    """expression : expression ADD expression"""
     p[0] = BinaryOperation(p, 'num', '+')
 
 def p_num_expression_sub(p):
-    """num_expression : num_expression SUB num_expression
-                    | id_expression SUB id_expression
-                    | id_expression SUB num_expression
-                    | num_expression SUB id_expression"""
+    """expression : expression SUB expression"""
     p[0] = BinaryOperation(p, 'num', '-')
 
 def p_num_expression_div(p):
-    """num_expression : num_expression DIV num_expression
-                    | id_expression DIV id_expression
-                    | id_expression DIV num_expression
-                    | num_expression DIV id_expression"""
+    """expression : expression DIV expression"""
     p[0] = BinaryOperation(p, 'num', '/')
 
 def p_num_expression_mul(p):
-    """num_expression : num_expression MUL num_expression
-                    | id_expression MUL id_expression
-                    | num_expression MUL id_expression
-                    | id_expression MUL num_expression"""
+    """expression : expression MUL expression"""
     p[0] = BinaryOperation(p, 'num', '*')
 
 def p_num_expression_unary_minus(p):
-    """num_expression : SUB num_expression %prec U_SUB
-                    | SUB id_expression %prec U_SUB"""
+    """expression : SUB expression %prec U_SUB"""
     p[0] = UnaryOperation(p, p[1])
 
 def p_num_expression_int(p):
-    """num_expression : INT_NUM"""
+    """expression : INT_NUM"""
     p[0] = Number(p,'int')
 
 def p_num_expression_float(p):
-    """num_expression : FLOAT_NUM"""
+    """expression : FLOAT_NUM"""
     p[0] = Number(p, 'float')
-
-'''
-def p_num_expression_id(p):
-    """num_expression : id_expression"""
-    p[0] = Number(p[0])
-'''
-def p_index(p):
-    """index : ID
-        | INT_NUM"""
-    p[0] = Index(p)
 
 ################################################
 # ..........matrix expressions..................
 ################################################
 
+
 def p_matrix_expression_init(p):
-    """matrix_expression : ZEROS '(' INT_NUM ')'
+    """expression : ZEROS '(' INT_NUM ')'
                  | ONES '(' INT_NUM ')'
                  | EYE '(' INT_NUM ')'"""
 
     p[0] = Matrix(p, type=p[1])
 
+
 def p_matrix_expression_value(p):
-    """matrix_expression :  '[' ']'
-                 | '[' lists ']'"""
+    """expression :  '[' ']'
+                 | '[' list2D ']'"""
     p[0] = Matrix(p)
 
-'''
-def p_matrix_expression_id(p):
-    """matrix_expression :  id_expression"""
-    p[0] = Matrix(p)
-'''
-def p_matrix_expression_transpose(p):
-    """matrix_expression : matrix_expression TRANSPOSE
-                        | id_expression TRANSPOSE"""
+def p_matrix_expressions(p):
+    """expression : expression TRANSPOSE"""
     p[0] = UnaryOperation(p, p[2])
 
-
 def p_matrix_expression_add(p):
-    """matrix_expression : matrix_expression DOT_ADD matrix_expression
-                | id_expression DOT_ADD id_expression
-                | matrix_expression DOT_ADD id_expression
-                | id_expression DOT_ADD matrix_expression"""
+    """expression : expression DOT_ADD expression"""
 
     p[0] = BinaryOperation(p, 'matrix', '+')
 
 def p_matrix_expression_sub(p):
-    """matrix_expression : matrix_expression DOT_SUB matrix_expression
-                | id_expression DOT_SUB id_expression
-                | id_expression DOT_SUB matrix_expression
-                | matrix_expression DOT_SUB id_expression"""
+    """expression : expression DOT_SUB expression"""
 
     p[0] = BinaryOperation(p, 'matrix', '-')
 
 def p_matrix_expression_mul(p):
-    """matrix_expression : matrix_expression DOT_MUL matrix_expression
-                | id_expression DOT_MUL id_expression
-                | id_expression DOT_MUL matrix_expression
-                | matrix_expression DOT_MUL id_expression"""
+    """expression : expression DOT_MUL expression"""
 
     p[0] = BinaryOperation(p, 'matrix', '*')
 
 def p_matrix_expression_div(p):
-    """matrix_expression : matrix_expression DOT_DIV matrix_expression
-                | id_expression DOT_DIV id_expression
-                | id_expression DOT_DIV matrix_expression
-                | matrix_expression DOT_DIV id_expression"""
+    """expression : expression DOT_DIV expression"""
 
     p[0] = BinaryOperation(p, 'matrix', '/')
 
 def p_matrix_expression_unary_minus(p):
-    """matrix_expression : DOT_SUB matrix_expression %prec U_DOT_SUB
-                        | DOT_SUB id_expression %prec U_DOT_SUB"""
+    """expression : DOT_SUB expression %prec U_DOT_SUB"""
     p[0] = UnaryOperation(p, p[1])
 
 ################################################
-# ..........lists ..............................
+# ....................list......................
 ################################################
 
-def p_lists(p):
-    """lists : vector ';' lists
-            | vector"""
+
+def p_list2D(p):
+    """list2D : list ';' list2D
+            | list"""
     if len(p) > 3:
         p[0] = List2D(p[1])
         p[0].append(p[3])
     else:
         p[0] = List2D(p[1])
 
-def p_num__list(p):
-    """vector : num_expression ',' list
-            | num_expression"""
-    if len(p) > 3:
-        p[0] = Vector(p[1])
-        p[0].extend(p[3])
-    else:
-        p[0] = Vector(p[1])
 
 def p_list(p):
     """list : expression ',' list
@@ -265,34 +213,17 @@ def p_list(p):
         p[0] = List(p[1])
 
 ################################################
-# ..........bool expressions....................
+# .................relations....................
 ################################################
 
-def p_num_expression_rel(p):
-    """bool_expression : num_expression LESS num_expression
-                | id_expression LESS id_expression
-                | num_expression LESS id_expression
-                | id_expression LESS num_expression
-                | num_expression LESS_OR_EQ num_expression
-                | id_expression LESS_OR_EQ id_expression
-                | id_expression LESS_OR_EQ num_expression
-                | num_expression LESS_OR_EQ id_expression
-                | num_expression GREATER num_expression
-                | id_expression GREATER id_expression
-                | id_expression GREATER num_expression
-                | num_expression GREATER id_expression
-                | num_expression GREATER_OR_EQ num_expression
-                | id_expression GREATER_OR_EQ id_expression
-                | id_expression GREATER_OR_EQ num_expression
-                | num_expression GREATER_OR_EQ id_expression
-                | num_expression EQ num_expression
-                | id_expression EQ id_expression
-                | id_expression EQ num_expression
-                | num_expression EQ id_expression
-                | num_expression NOT_EQ num_expression
-                | id_expression NOT_EQ id_expression
-                | id_expression NOT_EQ num_expression
-                | num_expression NOT_EQ id_expression"""
+
+def p_expression_relation(p):
+    """expression : expression LESS expression
+                | expression LESS_OR_EQ expression
+                | expression GREATER expression
+                | expression GREATER_OR_EQ expression
+                | expression EQ expression
+                | expression NOT_EQ expression"""
     p[0] = Relation(p)
 
 

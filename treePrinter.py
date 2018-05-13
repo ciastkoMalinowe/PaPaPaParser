@@ -129,13 +129,9 @@ class TreePrinter:
         for val in self.value:
             val.printTree(indent+1)
 
-    @addToClass(entities.Vector)
-    def printTree(self, indent=0):
-        print('| ' * indent + "VECTOR")
-        for val in self.value:
-            val.printTree(indent + 1)
 
     @addToClass(entities.List2D)
     def printTree(self, indent=0):
         for val in self.value:
-            val.printTree(indent)
+            print('| ' * indent + "VECTOR")
+            val.printTree(indent+1)

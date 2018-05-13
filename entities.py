@@ -177,16 +177,6 @@ class List:
     def extend(self, lista):
         self.value.extend(lista.get_value())
 
-class Vector:
-    def __init__(self, initial_val):
-        self.value = [initial_val]
-
-    def get_value(self):
-        return self.value
-
-    def extend(self, vector):
-        self.value.extend(vector.get_value())
-
 
 class List2D:
     def __init__(self, initial_val):
