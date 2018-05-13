@@ -46,5 +46,5 @@ if __name__ == '__main__':
 
     parser = yacc.yacc(module=parser2)
     ast = parser.parse(text, lexer=lexer)
-    print (ast)
+    # print (ast)
     ast.printTree()

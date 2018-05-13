@@ -22,6 +22,7 @@ start = 'program'
 
 def p_error(p):
     if p:
+        print(p)
         print("Syntax error at line {0}, column {1}: LexToken({2}, '{3}')".format(p.lineno, scanner.find_column(p),
                                                                                   p.type, p.value))
     else:
@@ -66,7 +67,9 @@ def p_loop_while(p):
 
 
 def p_loop_for(p):
-    """loop : FOR ID ASSIGN expression RANGE expression '{' program '}'"""
+    """loop : FOR ID ASSIGN expression RANGE expression '{' program '}'
+            | FOR ID ASSIGN expression RANGE expression statement """
+
     p[0] = ForLoop(p)
 
 def p_condition_if(p):
