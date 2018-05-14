@@ -1,21 +1,31 @@
+z = 0 + zeros(5);
+z = 2 + x;
+z = eye(5) .+ eye(8);
 
-x = 0;
-y = zeros(5);
-z = x + y;
 
-x = eye(5);
-y = eye(8);
-z = x + y;
+z = [ 1,2,3,4,5 ] .+   [ 1,2,3,4,5;
+                        1,2,3,4,5 ];
 
-x = [ 1,2,3,4,5 ];
-y = [ 1,2,3,4,5;
-      1,2,3,4,5 ];
-z = x + y;
+z = zeros(5) + zeros(5);
 
-x = zeros(5);
-y = zeros(5);
-z = x + y;
+x = [1,2,3;
+     1,2,3,4,5;
+     1,2];
+
+x=0;
+
+continue;
+
+return;
+
+break;
+
+return;
+
+return;
+
+print x;
 
 x = ones(3);
-z = x[7,10];
+eye(5) = x[7,10];
 v = x[2,3];

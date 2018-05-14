@@ -27,13 +27,17 @@ class Matrix:
     def __init__(self, p, line, type=None):
         self.line = line
         self.type = type
-        if type is not None:
-            self.content = p[3]
-        else:
+        if type is None:
             self.content = p[2]
-        self.isBoolean = False
-        self.isNumber = False
-        self.isMatrix = True
+            self.x = len(p[2].get_value())
+            if self.x != 0:
+                self.y = len(p[2].get_value()[0].get_value())
+            else:
+                self.y = 0
+        else:
+            self.content = p[3]
+            self.x = p[3]
+            self.y = p[3]
 
 
 class Number:
@@ -42,9 +46,6 @@ class Number:
         self.line = line
         self.value = p[1]
         self.type = type
-        self.isBoolean = False
-        self.isNumber = True
-        self.isMatrix = False
 
 
 class BinaryOperation:
@@ -54,9 +55,6 @@ class BinaryOperation:
         self.operator = p[2]
         self.left = p[1]
         self.right = p[3]
-        self.isBoolean = False
-        self.isNumber = True
-        self.isMatrix = True
 
 
 class UnaryOperation:
@@ -106,6 +104,9 @@ class Return:
 
     def __init__(self, p, line):
         self.line = line
+        self.variable = None
+        if(len(p) > 3):
+            self.variable = p[2]
 
 class Break:
 
@@ -141,7 +142,8 @@ class Program:
 
 class List:
 
-    def __init__(self, initial_val):
+    def __init__(self, initial_val, line):
+        self.line = line
         self.value = [initial_val]
 
     def get_value(self):
@@ -152,7 +154,8 @@ class List:
 
 
 class List2D:
-    def __init__(self, initial_val):
+    def __init__(self, initial_val, line):
+        self.line = line
         self.value = [initial_val]
 
     def get_value(self):
