@@ -136,7 +136,7 @@ def p_num_expression_unary_minus(p):
 
 def p_num_expression_int(p):
     """expression : INT_NUM"""
-    p[0] = Number(p, p.lexer.lineno - 1, 'int')
+    p[0] = Number(p, p.lexer.lineno - 1, 'integer')
 
 def p_num_expression_float(p):
     """expression : FLOAT_NUM"""
@@ -152,7 +152,7 @@ def p_matrix_expression_init(p):
                  | ONES '(' INT_NUM ')'
                  | EYE '(' INT_NUM ')'"""
 
-    p[0] = Matrix(p, p.lexer.lineno - 1, type=p[1])
+    p[0] = Matrix(p, p.lexer.lineno - 1, type=p[1], dim=p[3])
 
 
 def p_matrix_expression_value(p):

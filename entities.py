@@ -24,9 +24,13 @@ class Condition:
 
 class Matrix:
 
-    def __init__(self, p, line, type=None):
+    def __init__(self, p, line, type=None, dim=None):
         self.line = line
         self.type = type
+        self.dim = dim
+        if dim:
+            self.dim = int(dim)
+        self.matrix = None
         if type is None:
             self.content = p[2]
             self.x = len(p[2].get_value())
@@ -44,7 +48,7 @@ class Number:
 
     def __init__(self, p, line, type):
         self.line = line
-        self.value = p[1]
+        self.value = int(p[1])
         self.type = type
 
 

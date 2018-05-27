@@ -1,4 +1,42 @@
+x = 0;
+y = zeros(5);
+z = x + y;
+
+x = eye(5);
+y = eye(8);
+z = x .+ y;
+
+x = [ 1,2,3,4,5 ];
+y = [ 1,2,3,4,5;
+      1,2,3,4,5 ];
+z = x + y;
+
+x = zeros(5);
+y = zeros(5);
+z = x + y;
+
+x = ones(3);
+z = x[7,10];
+v = x[2,3];
+
+x=0;
+
+continue;
+
+return x;
+
+break;
+
+return x+1;
+
+return 2*x;
+
+print x;
+
+
+
 z = 0 + zeros(5);
+x = 3;
 z = 2 + x;
 z = eye(5) .+ eye(8);
 
@@ -26,6 +64,6 @@ return;
 
 print x;
 
-x = ones(3);
-eye(5) = x[7,10];
+x = ones(12);
+y = x[7,10];
 v = x[2,3];
