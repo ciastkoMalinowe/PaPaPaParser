@@ -56,6 +56,7 @@ import parser2
 from treePrinter import TreePrinter
 from typeChecker import TypeChecker
 import ply.yacc as yacc
+from Interpreter import Interpreter
 
 if __name__ == '__main__':
 
@@ -75,3 +76,9 @@ if __name__ == '__main__':
     # Below code shows how to use visitor
     typeChecker = TypeChecker()
     typeChecker.visit(ast)
+
+    if typeChecker.errors:
+        sys.exit(1)
+    else:
+        interpreter = Interpreter()
+        interpreter.visit(ast)

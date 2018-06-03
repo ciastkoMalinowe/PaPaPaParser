@@ -1,6 +1,7 @@
 import entities
 import symbol_table
 
+
 class NodeVisitor(object):
     def visit(self, node):
         method = 'visit_' + node.__class__.__name__
@@ -12,8 +13,10 @@ class NodeVisitor(object):
 
 
 class TypeChecker(NodeVisitor):
-
     table = symbol_table.SymbolTable(None, 'program')
+
+    def __init__(self):
+        self.errors = False
 
     def visit_ID(self, node):
         symbol = self.table.get(node.id)
@@ -46,7 +49,7 @@ class TypeChecker(NodeVisitor):
             node.matrix = [1 for i in range(node.dim)] * node.dim
 
         elif node.type == 'eye':
-            node.matrix = [[ 1 if i==j else 0 for i in range(node.dim)] for j in range(node.dim)]
+            node.matrix = [[1 if i == j else 0 for i in range(node.dim)] for j in range(node.dim)]
 
         return f'matrix {node.dim} {node.dim} integer'
 
@@ -79,7 +82,6 @@ class TypeChecker(NodeVisitor):
 
         return 'integer'
 
-
     def visit_Condition(self, node):
 
         bool = self.visit(node.bool_expression)
@@ -93,7 +95,6 @@ class TypeChecker(NodeVisitor):
         self.table.pushScope('condition')
         self.visit(node.statement2)
         self.table.popScope()
-
 
     def visit_BinaryOperation(self, node):
         right = self.visit(node.right)
@@ -123,38 +124,34 @@ class TypeChecker(NodeVisitor):
 
         else:
             if right not in ['integer', 'float']:
-
                 print(f"Error in line {node.line}: {node.operator} require number arguments!")
                 return 'integer'
             if left not in ['integer', 'float']:
-
                 print(f"Error in line {node.line}: {node.operator} require number arguments!")
                 return 'integer'
             return right
 
-
     def visit_UnaryOperation(self, node):
 
         arg = self.visit(node.arg)
-        if node.operation == '\'':
+        if node.operator == '\'':
             if 'matrix' not in arg:
                 print(f"Error in line {node.line}: Wrong transpose argument (of matrix type required)!")
             else:
                 return 'matrix -1 -1 None'
 
-        if node.operation == '.-':
+        if node.operator == '.-':
             if 'matrix' not in arg:
                 print(f"Error in line {node.line}: Wrong .- argument (of matrix type required)!")
             else:
                 return 'matrix -1 -1 None'
 
-        if node.operation == '-':
+        if node.operator == '-':
             if arg not in ['integer', 'float']:
                 print(f"Error in line {node.line}: Wrong - argument (of number type required)!")
                 return 'integer'
             else:
                 return arg
-
 
     def visit_Assignment(self, node):
 
@@ -176,7 +173,6 @@ class TypeChecker(NodeVisitor):
                 print(f"Error in line {node.line}: Such assignment requires right arg of number type!")
         return 'assignment'
 
-
     def visit_Relation(self, node):
 
         left = self.visit(node.left)
@@ -189,7 +185,6 @@ class TypeChecker(NodeVisitor):
 
         return 'boolean'
 
-
     def visit_WhileLoop(self, node):
 
         expr = self.visit(node.expr)
@@ -201,8 +196,6 @@ class TypeChecker(NodeVisitor):
         prog = self.visit(node.prog)
         self.table.popScope()
         return 'loop'
-
-
 
     def visit_ForLoop(self, node):
 
@@ -223,12 +216,10 @@ class TypeChecker(NodeVisitor):
             print(f"Error in line {node.line}: End value of iterator has to be a number!")
         return 'loop'
 
-
     def visit_Print(self, node):
 
         self.visit(node.list)
         return 'print'
-
 
     def visit_Program(self, node):
 
@@ -245,7 +236,7 @@ class TypeChecker(NodeVisitor):
             types.append(self.visit(n))
         diff = False
         for i in range(length - 1):
-            if types[i] != types[i+1]:
+            if types[i] != types[i + 1]:
                 diff = True
 
         if diff:
@@ -264,10 +255,10 @@ class TypeChecker(NodeVisitor):
 
         ok = True
         diff = False
-        for i in range(len(list_of_length) -1):
-            if list_of_length[i] != list_of_length[i+1]:
+        for i in range(len(list_of_length) - 1):
+            if list_of_length[i] != list_of_length[i + 1]:
                 ok = False
-            if list_of_type[i] != list_of_type[i+1]:
+            if list_of_type[i] != list_of_type[i + 1]:
                 diff = True
         if 'different' in list_of_type:
             diff = True
@@ -283,7 +274,6 @@ class TypeChecker(NodeVisitor):
     def visit_Empty(self, node):
         return 'empty'
 
-
     def visit_Break(self, node):
         if not self.table.is_inside_loop():
             print(f"Error in line {node.line}: Break outside a loop")
@@ -298,6 +288,6 @@ class TypeChecker(NodeVisitor):
 
         if node.variable:
             n_type = self.visit(node.variable)
-            if n_type not in ['integer','float', 'boolean'] and not 'matrix' in n_type:
+            if n_type not in ['integer', 'float', 'boolean'] and not 'matrix' in n_type:
                 print(f"Error in line {node.line}: Wrong returned type!")
         return 'return'
