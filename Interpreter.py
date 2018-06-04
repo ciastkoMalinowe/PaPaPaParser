@@ -3,6 +3,7 @@ import entities
 from memory import *
 from Exceptions import *
 from visit import *
+import copy
 import sys
 
 sys.setrecursionlimit(10000)
@@ -13,7 +14,15 @@ operations = {
     "/": (lambda l, r: l / r),
     "*": (lambda l, r: l * r),
     "-u": (lambda e: -e),
-    # TODO: matrix operators and functions
+    ".+": (lambda l, r: matrix_opertion(l, r, "+")),
+    ".-": (lambda l, r: matrix_opertion(l, r, "-")),
+    "./": (lambda l, r: matrix_opertion(l, r, "/")),
+    ".*": (lambda l, r: matrix_opertion(l, r, "*")),
+    ".+=": (lambda l, r: matrix_opertion(l, r, "+")),
+    ".-=": (lambda l, r: matrix_opertion(l, r, "-")),
+    "./=": (lambda l, r: matrix_opertion(l, r, "/")),
+    ".*=": (lambda l, r: matrix_opertion(l, r, "*")),
+    "'": (lambda m: transpose(m)),
     "=": (lambda l, r: r),
     "+=": (lambda l, r: l + r),
     "-=": (lambda l, r: l - r),
@@ -25,6 +34,17 @@ operations = {
     "<": (lambda l, r: l < r),
     "<=": (lambda l, r: l <= r)
 }
+
+def transpose(m):
+    return [list(i) for i in zip(*m)]
+
+def matrix_opertion(x, y, op):
+    # return [[operations[op](a, b) for a, b in zip(x, y)] for x, y in zip(x, y)]
+    r = copy.copy(x)
+    for i in range(len(x)):
+        for j in range(len(x[i])):
+            r[i][j] = operations[op](x[i][j], y[i][j])
+    return r
 
 
 class Interpreter(object):
@@ -38,6 +58,7 @@ class Interpreter(object):
 
     @when(entities.ID)
     def visit(self, node):
+
         return self.memory_stack.get(node.id)
 
     @when(entities.IDAt)
@@ -69,7 +90,7 @@ class Interpreter(object):
             for i in range(node.dim):
                 m[i][i] = 1
 
-        import code; code.interact(local=dict(globals(), **locals()))
+        # import code; code.interact(local=dict(globals(), **locals()))
         return m
 
 
@@ -82,6 +103,7 @@ class Interpreter(object):
         r1 = self.visit(node.left)
         r2 = self.visit(node.right)
         op = node.operator
+        # import code; code.interact(local=dict(globals(), **locals()))
         return operations[op](r1, r2)
 
     @when(entities.UnaryOperation)
@@ -89,16 +111,18 @@ class Interpreter(object):
         # import code; code.interact(local=dict(globals(), **locals()))
         op = node.operator
         arg = self.visit(node.arg)
-        return operations[op](arg)
+        return operations[op+"u"](arg)
 
     @when(entities.Assignment)
     def visit(self, node):
         # expr = node.expr.accept(self)
         expr = self.visit(node.right)
         op = node.operator
-        var = self.memory_stack.get(node.left)
+        var = self.memory_stack.get(node.left.id)
+        # if var is None:
         value = operations[op](var, expr)
-        self.memory_stack.set(var, value)
+        self.memory_stack.set(node.left.id, value)
+        # import code; code.interact(local=dict(globals(), **locals()))
         return value
 
     @when(entities.Relation)
@@ -126,7 +150,7 @@ class Interpreter(object):
     def visit(self, node):
         beg = self.visit(node.beg)
         end = self.visit(node.end)
-        self.memory_stack.push(MemoryStack("ForLoop"))
+        self.memory_stack.push(Memory("ForLoop"))
         for i in range(beg, end):
             try:
                 self.memory_stack.set(node.id, i)
@@ -152,7 +176,8 @@ class Interpreter(object):
 
     @when(entities.Print)
     def visit(self, node):
-        print(self.visit(node.list))
+        list = self.visit(node.list)
+        print(list if len(list) > 1 else list[0])
 
     @when(entities.Empty)
     def visit(self, node):

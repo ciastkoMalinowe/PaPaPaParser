@@ -38,6 +38,8 @@ class MemoryStack:
         length = len(self.stack)
         for i in range(length):
             id = length - i - 1
+            # import code;
+            # code.interact(local=dict(globals(), **locals()))
             if self.stack[id].has_key(name):
                 self.stack[id].put(name, value)
             else:

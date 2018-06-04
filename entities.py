@@ -42,6 +42,9 @@ class Matrix:
             self.content = p[3]
             self.x = p[3]
             self.y = p[3]
+            if(self.x == self.y and self.dim is None):
+                self.dim = int(self.x)
+
 
 
 class Number:
