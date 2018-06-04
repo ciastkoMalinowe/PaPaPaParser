@@ -74,11 +74,11 @@ if __name__ == '__main__':
     ast = parser.parse(text, lexer=lexer)
 
     # Below code shows how to use visitor
-    # typeChecker = TypeChecker()
-    # typeChecker.visit(ast)
-    #
-    # if typeChecker.errors:
-    #     sys.exit(1)
-    # else:
-    interpreter = Interpreter()
-    interpreter.visit(ast)
+    typeChecker = TypeChecker()
+    typeChecker.visit(ast)
+
+    if typeChecker.errors:
+        sys.exit(1)
+    else:
+        interpreter = Interpreter()
+        interpreter.visit(ast)

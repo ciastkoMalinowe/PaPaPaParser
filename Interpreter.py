@@ -196,6 +196,6 @@ class Interpreter(object):
 
     @when(entities.List2D)
     def visit(self, node):
-        return self.visit(node.get_value()[0])
-        # return [self.visit(x) for x in node.get_value()]
+        #return self.visit(node.get_value()[0])
+        return [self.visit(x) for x in node.get_value()]
         # return node.get_value()
