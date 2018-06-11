@@ -35,8 +35,10 @@ operations = {
     "<=": (lambda l, r: l <= r)
 }
 
+
 def transpose(m):
     return [list(i) for i in zip(*m)]
+
 
 def matrix_opertion(x, y, op):
     # return [[operations[op](a, b) for a, b in zip(x, y)] for x, y in zip(x, y)]
@@ -48,7 +50,6 @@ def matrix_opertion(x, y, op):
 
 
 class Interpreter(object):
-
     def __init__(self):
         self.memory_stack = MemoryStack()
 
@@ -93,7 +94,6 @@ class Interpreter(object):
         # import code; code.interact(local=dict(globals(), **locals()))
         return m
 
-
     @when(entities.Number)
     def visit(self, node):
         return node.value
@@ -111,7 +111,7 @@ class Interpreter(object):
         # import code; code.interact(local=dict(globals(), **locals()))
         op = node.operator
         arg = self.visit(node.arg)
-        return operations[op+"u"](arg)
+        return operations[op + "u"](arg)
 
     @when(entities.Assignment)
     def visit(self, node):
@@ -134,32 +134,36 @@ class Interpreter(object):
 
     @when(entities.WhileLoop)
     def visit(self, node):
-        condition = self.visit(node.expr)
-        self.memory_stack.push(Memory("WhileLoop"))
-        while condition:
-            try:
-                self.visit(node.prog)
-                condition = self.visit(node.expr)
-            except BreakException:
-                break
-            except ContinueException:
-                continue
-        self.memory_stack.pop()
+        try:
+            condition = self.visit(node.expr)
+            self.memory_stack.push(Memory("WhileLoop"))
+            while condition:
+                try:
+                    self.visit(node.prog)
+                    condition = self.visit(node.expr)
+                except BreakException:
+                    break
+                except ContinueException:
+                    continue
+        finally:
+            self.memory_stack.pop()
 
     @when(entities.ForLoop)
     def visit(self, node):
-        beg = self.visit(node.beg)
-        end = self.visit(node.end)
-        self.memory_stack.push(Memory("ForLoop"))
-        for i in range(beg, end):
-            try:
-                self.memory_stack.set(node.id, i)
-                self.visit(node.prog)
-            except BreakException:
-                break
-            except ContinueException:
-                continue
-        self.memory_stack.pop()
+        try:
+            beg = self.visit(node.beg)
+            end = self.visit(node.end)
+            self.memory_stack.push(Memory("ForLoop"))
+            for i in range(beg, end):
+                try:
+                    self.memory_stack.set(node.id, i)
+                    self.visit(node.prog)
+                except BreakException:
+                    break
+                except ContinueException:
+                    continue
+        finally:
+            self.memory_stack.pop()
 
     @when(entities.Return)
     def visit(self, node):
@@ -196,6 +200,6 @@ class Interpreter(object):
 
     @when(entities.List2D)
     def visit(self, node):
-        #return self.visit(node.get_value()[0])
+        # return self.visit(node.get_value()[0])
         return [self.visit(x) for x in node.get_value()]
         # return node.get_value()

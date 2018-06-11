@@ -15,6 +15,28 @@ class NodeVisitor(object):
 
 class TypeChecker(NodeVisitor):
     table = symbol_table.SymbolTable(None, 'program')
+    kind ={
+        '+': 'scalars',
+        '-': 'scalars',
+        '*': 'scalars',
+        '/': 'scalars',
+        '.+': 'matrices',
+        '.-': 'matrices',
+        '.*': 'matrices',
+        './': 'matrices'
+    }
+    result_types = {
+        'scalars': {
+            (types_.Int, types_.Int): types_.Int,
+            (types_.Int, types_.Float): types_.Float,
+            (types_.Float, types_.Int): types_.Float,
+            (types_.Float, types_.Float): types_.Float
+        },
+        'matrices': {
+            (types_.Matrix, types_.Matrix): types_.Matrix,
+        }
+
+    }
 
     def __init__(self):
         self.errors = False
@@ -100,14 +122,14 @@ class TypeChecker(NodeVisitor):
 
             return right
 
-        else:
+        elif node.operator in ['+', '-', '*', '/']:
             if not right.is_numeric():
                 print(f"Error in line {node.line}: {node.operator} require number arguments!")
                 return types_.Int()
             if not left.is_numeric():
                 print(f"Error in line {node.line}: {node.operator} require number arguments!")
                 return types_.Int()
-            return right
+            return TypeChecker.result_types[TypeChecker.kind[node.operator]][(left.__class__,right.__class__)]()
 
     def visit_UnaryOperation(self, node):
 
