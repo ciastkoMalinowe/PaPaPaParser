@@ -1,6 +1,7 @@
 import entities
 import symbol_table
 import types_
+from collections import defaultdict
 
 
 class NodeVisitor(object):
@@ -15,28 +16,18 @@ class NodeVisitor(object):
 
 class TypeChecker(NodeVisitor):
     table = symbol_table.SymbolTable(None, 'program')
-    kind ={
-        '+': 'scalars',
-        '-': 'scalars',
-        '*': 'scalars',
-        '/': 'scalars',
-        '.+': 'matrices',
-        '.-': 'matrices',
-        '.*': 'matrices',
-        './': 'matrices'
-    }
-    result_types = {
-        'scalars': {
+
+    result_types = defaultdict(lambda :{
             (types_.Int, types_.Int): types_.Int,
             (types_.Int, types_.Float): types_.Float,
             (types_.Float, types_.Int): types_.Float,
             (types_.Float, types_.Float): types_.Float
-        },
-        'matrices': {
-            (types_.Matrix, types_.Matrix): types_.Matrix,
-        }
+        })
+    result_types['.+'] = {(types_.Matrix, types_.Matrix): types_.Matrix}
+    result_types['.-'] = {(types_.Matrix, types_.Matrix): types_.Matrix}
+    result_types['./'] = {(types_.Matrix, types_.Matrix): types_.Matrix}
+    result_types['.*'] = {(types_.Matrix, types_.Matrix): types_.Matrix}
 
-    }
 
     def __init__(self):
         self.errors = False
@@ -129,7 +120,7 @@ class TypeChecker(NodeVisitor):
             if not left.is_numeric():
                 print(f"Error in line {node.line}: {node.operator} require number arguments!")
                 return types_.Int()
-            return TypeChecker.result_types[TypeChecker.kind[node.operator]][(left.__class__,right.__class__)]()
+            return TypeChecker.result_types[node.operator][(left.__class__,right.__class__)]()
 
     def visit_UnaryOperation(self, node):
 
